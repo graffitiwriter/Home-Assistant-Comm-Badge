@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>COMM BADGE CONFIG</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#ff9900;font-family:'Antonio',sans-serif;padding:10px}
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap');
+.lcars-frame{border:3px solid #cc99ff;border-radius:30px;overflow:hidden;max-width:700px;margin:0 auto}
+.lcars-header{background:#cc99ff;color:#000;padding:15px 25px;display:flex;justify-content:space-between;align-items:center}
+.lcars-header h1{font-size:20px;letter-spacing:2px}
+.lcars-header span{font-size:12px}
+.lcars-body{display:flex;min-height:70vh}
+.lcars-sidebar{background:#000;width:60px;display:flex;flex-direction:column;gap:2px;padding:2px}
+.lcars-pill{border-radius:15px 0 0 15px;padding:12px 8px;text-align:center;font-size:10px;cursor:pointer}
+.pill-orange{background:#ff9966;color:#000}
+.pill-blue{background:#99ccff;color:#000}
+.pill-purple{background:#cc99ff;color:#000}
+.pill-tan{background:#ffcc99;color:#000}
+.lcars-content{flex:1;padding:15px;overflow-y:auto}
+.section{background:#111;border-left:4px solid #ff9966;padding:12px;margin-bottom:12px;border-radius:0 8px 8px 0}
+.section h2{color:#ff9966;font-size:14px;margin-bottom:10px;letter-spacing:1px}
+.section.blue{border-left-color:#99ccff}
+.section.blue h2{color:#99ccff}
+.section.purple{border-left-color:#cc99ff}
+.section.purple h2{color:#cc99ff}
+.section.tan{border-left-color:#ffcc99}
+.section.tan h2{color:#ffcc99}
+.field{margin-bottom:10px}
+label{display:block;color:#cc99ff;font-size:11px;margin-bottom:3px;letter-spacing:1px}
+input,select,textarea{width:100%;padding:8px;background:#0a0a0a;border:1px solid #333;border-radius:4px;color:#ff9900;font-family:'Antonio',sans-serif;font-size:14px}
+input:focus,select:focus{outline:none;border-color:#ff9966}
+.row{display:flex;gap:8px}
+.row .field{flex:1}
+.checkbox-field{display:flex;align-items:center;gap:8px}
+.checkbox-field input{width:auto}
+.checkbox-field label{margin:0;font-size:12px}
+.status-bar{display:flex;gap:15px;padding:10px;background:#111;border-radius:8px;margin-bottom:12px;flex-wrap:wrap}
+.status-item{display:flex;align-items:center;gap:5px}
+.status-item .lbl{color:#666;font-size:10px}
+.status-item .val{color:#99ccff;font-size:12px}
+.btn{display:inline-block;padding:12px 25px;border:none;border-radius:20px;font-family:'Antonio',sans-serif;font-size:16px;cursor:pointer;margin-right:10px;margin-top:10px}
+.btn-orange{background:#ff9966;color:#000}
+.btn-purple{background:#cc99ff;color:#000}
+.btn:hover{filter:brightness(1.2)}
+.lcars-footer{background:#cc99ff;color:#000;padding:8px 20px;font-size:11px;display:flex;justify-content:space-between}
+.hidden{display:none}
+.provider-warning{color:#ffcc99;font-size:11px;margin-top:5px;padding:5px;background:#222;border-radius:4px}
+@media(max-width:500px){.lcars-sidebar{width:40px}.lcars-pill{font-size:8px;padding:8px 4px}.row{flex-direction:column;gap:0}}
+  </style>
+</head>
+<body>
+
+<div class="lcars-frame">
+
+  <div class="lcars-header">
+    <h1>COMM BADGE CONFIGURATION</h1>
+    <span>STARFLEET ISSUE</span>
+  </div>
+
+  <div class="lcars-body">
+
+    <div class="lcars-sidebar">
+      <div class="lcars-pill pill-orange" style="flex:2">LCARS</div>
+      <div class="lcars-pill pill-blue">47</div>
+      <div class="lcars-pill pill-purple">148</div>
+      <div class="lcars-pill pill-tan" style="flex:3">CONFIG</div>
+      <div class="lcars-pill pill-blue">22</div>
+      <div class="lcars-pill pill-orange" style="flex:2">1701</div>
+    </div>
+
+    <div class="lcars-content">
+      <form action="#" method="POST" onsubmit="return false">
+
+        <!-- Status bar (hardcoded for preview) -->
+        <div class="status-bar">
+          <div class="status-item"><span class="lbl">POWER:</span><span class="val">82%</span></div>
+          <div class="status-item"><span class="lbl">SIGNAL:</span><span class="val">-58 dBm</span></div>
+          <div class="status-item"><span class="lbl">VERSION:</span><span class="val">3.8</span></div>
+        </div>
+
+        <!-- WiFi -->
+        <div class="section blue">
+          <h2>SUBSPACE RELAY (WIFI)</h2>
+          <div class="row">
+            <div class="field">
+              <label>NETWORK SSID</label>
+              <input name="ssid" value="EnterpriseD">
+            </div>
+            <div class="field">
+              <label>ACCESS CODE</label>
+              <input type="password" name="pass" value="password">
+            </div>
+          </div>
+        </div>
+
+        <!-- LLM -->
+        <div class="section purple">
+          <h2>UNIVERSAL TRANSLATOR (SPEECH RECOGNITION)</h2>
+          <div class="field">
+            <label>AI PROVIDER</label>
+            <select name="llmProvider" id="llmProvider">
+              <option value="groq" selected>GROQ (RECOMMENDED)</option>
+              <option value="openai">OPENAI</option>
+              <option value="custom">CUSTOM WHISPER ENDPOINT</option>
+            </select>
+            <div class="provider-warning" id="providerWarning">&#x2705; Official Groq Whisper endpoint (fastest)</div>
+          </div>
+          <div class="field">
+            <label>API KEY</label>
+            <input type="password" name="llmKey" value="gsk_examplekey">
+          </div>
+          <div class="field">
+            <label>API URL</label>
+            <input name="llmUrl" id="llmUrl" value="https://api.groq.com/openai/v1/audio/transcriptions">
+          </div>
+          <div class="field">
+            <label>VOICE ACTIVITY DETECTION SENSITIVITY</label>
+            <input type="range" name="vadSens" min="1" max="10" value="5" style="width:100%">
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span>Very Sensitive</span><span>Less Sensitive</span>
+            </div>
+            <div style="color:#666;font-size:11px;margin-top:5px">1=stops quickly after speech | 10=waits longer</div>
+          </div>
+        </div>
+
+        <!-- Home Assistant -->
+        <div class="section tan">
+          <h2>SHIP'S COMPUTER (HOME ASSISTANT)</h2>
+          <div class="field">
+            <label>SHIP'S COMPUTER ADDRESS</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select name="haProto" id="haProto" style="width:auto;flex:0 0 auto;appearance:none;-webkit-appearance:none" onchange="updateHaProtoWarn()">
+                <option value="https://" selected>https://</option>
+                <option value="http://">http://</option>
+              </select>
+              <input name="haHost" placeholder="10.0.0.2 or home.example.com" value="home.example.com" style="flex:1">
+              <input type="number" name="haPort" placeholder="8123" min="1" max="65535" value="8123" style="flex:0 0 120px;width:120px">
+            </div>
+            <div id="haProtoWarn" class="provider-warning" style="display:none">
+              &#x26A0; HTTP only &mdash; use for local network servers (e.g. 192.168.x.x). Never over the internet.
+            </div>
+          </div>
+          <div class="field">
+            <label>LONG-LIVED (and prosper) ACCESS TOKEN</label>
+            <input type="password" name="hatoken" value="eyexampletoken">
+          </div>
+        </div>
+
+        <!-- Sensor Calibration -->
+        <div class="section blue">
+          <h2>SENSOR CALIBRATION</h2>
+          <div class="field">
+            <label>TAP SENSITIVITY <span id="tapVal">3.4</span></label>
+            <input type="range" name="tap" min="20" max="45" step="1" value="34" style="width:100%"
+              oninput="document.getElementById('tapVal').textContent=(this.value/10).toFixed(1)">
+            <div style="color:#666;font-size:11px;margin-top:5px">Gentle tap &#x2190; &#x2192; Firm tap</div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>MAX RECORD TIME (sec)</label>
+              <input type="number" min="1" max="6" name="rec" value="4">
+            </div>
+            <div class="field">
+              <label>DEEP SLEEP TIMEOUT (sec)</label>
+              <input type="number" min="10" max="120" name="sleep" value="60">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-purple">ENGAGE</button>
+        <button type="button" class="btn btn-orange" onclick="alert('Reset to factory defaults?')">RESET</button>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="lcars-footer">
+    <span>CHIEF ENGINEER: LIEUTENANT COMMANDER SPANNER  -  https://sthi.space</span>
+    <span>LCARS ACCESS 47988</span>
+  </div>
+
+</div>
+
+<script>
+  function updateHaProtoWarn() {
+    var w = document.getElementById('haProtoWarn');
+    w.style.display = document.getElementById('haProto').value === 'http://' ? 'block' : 'none';
+  }
+
+  document.getElementById('llmProvider').onchange = function() {
+    const urlField = document.getElementById('llmUrl');
+    const warn = document.getElementById('providerWarning');
+    switch(this.value) {
+      case 'groq':
+        urlField.value = 'https://api.groq.com/openai/v1/audio/transcriptions';
+        warn.textContent = '\u2705 Official Groq Whisper endpoint (fastest)';
+        warn.style.color = '#99ccff';
+        break;
+      case 'openai':
+        urlField.value = 'https://api.openai.com/v1/audio/transcriptions';
+        warn.textContent = '\u2705 Official OpenAI Whisper endpoint';
+        warn.style.color = '#99ccff';
+        break;
+      case 'custom':
+        urlField.value = '';
+        warn.textContent = '\U0001f527 Enter any Whisper-compatible API endpoint (e.g., proxy)';
+        warn.style.color = '#ff9966';
+        break;
+    }
+  };
+</script>
+
+</body>
+</html>
