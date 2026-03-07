@@ -308,11 +308,48 @@ String generateConfigPage() {
   html += F("<span>Very Sensitive</span><span>Less Sensitive</span></div>");
   html += F("<div style='color:#666;font-size:11px;margin-top:5px'>1=stops quickly after speech | 10=waits longer</div></div></div>");
   
+  // Parse existing haUrl into parts for pre-population
+  String haUrlStr = String(config.haUrl);
+  String haProto = "https://";
+  String haHost = "";
+  String haPort = "8123";
+  if (haUrlStr.startsWith("http://")) {
+    haProto = "http://";
+    haUrlStr = haUrlStr.substring(7);
+  } else if (haUrlStr.startsWith("https://")) {
+    haProto = "https://";
+    haUrlStr = haUrlStr.substring(8);
+  }
+  int colonPos = haUrlStr.lastIndexOf(':');
+  if (colonPos > 0) {
+    haHost = haUrlStr.substring(0, colonPos);
+    haPort = haUrlStr.substring(colonPos + 1);
+  } else {
+    haHost = haUrlStr;
+  }
+
   // Ship's Computer (Home Assistant)
   html += F("<div class='section tan'><h2>SHIP'S COMPUTER (HOME ASSISTANT)</h2>");
-  html += F("<div class='field'><label>SHIP'S COMPUTER URL</label><input name='haurl' value='");
-  html += config.haUrl;
-  html += F("'></div>");
+  html += F("<div class='field'><label>SHIP'S COMPUTER ADDRESS</label>");
+  html += F("<div style='display:flex;gap:8px;align-items:center'>");
+  // Protocol selector
+  html += F("<select name='haProto' id='haProto' style='width:auto;flex:0 0 auto;appearance:none;-webkit-appearance:none' onchange='updateHaProtoWarn()'>");
+  html += F("<option value='https://'"); if (haProto == "https://") html += F(" selected"); html += F(">https://</option>");
+  html += F("<option value='http://'"); if (haProto == "http://") html += F(" selected"); html += F(">http://</option>");
+  html += F("</select>");
+  // Host
+  html += F("<input name='haHost' placeholder='10.0.0.2 or home.example.com' style='flex:1' value='");
+  html += haHost;
+  html += F("'>");
+  // Port
+  html += F("<input type='number' name='haPort' placeholder='8123' min='1' max='65535' style='flex:0 0 120px;width:120px' value='");
+  html += haPort;
+  html += F("'>");
+  html += F("</div>"); // end url row
+  html += F("<div id='haProtoWarn' class='provider-warning' style='display:");
+  html += (haProto == "http://") ? F("block") : F("none");
+  html += F("'>⚠ HTTP only — use for local network servers (e.g. 192.168.x.x). Never over the internet.</div>");
+  html += F("</div>"); // end field
   html += F("<div class='field'><label>LONG-LIVED (and prosper) ACCESS TOKEN</label><input type='password' name='hatoken' value='");
   html += config.haToken;
   html += F("'></div></div>");
@@ -346,6 +383,9 @@ String generateConfigPage() {
   
   // JavaScript
   html += F("<script>");
+  html += F("function updateHaProtoWarn(){");
+  html += F("var w=document.getElementById('haProtoWarn');");
+  html += F("w.style.display=document.getElementById('haProto').value==='http://'?'block':'none';}");
   html += F("document.getElementById('llmProvider').onchange=function(){");
   html += F("const urlField=document.getElementById('llmUrl');");
   html += F("const warn=document.getElementById('providerWarning');");
@@ -389,7 +429,10 @@ void handleConfigSave() {
   if (configServer->hasArg("llmProvider")) strlcpy(config.llmProvider, configServer->arg("llmProvider").c_str(), sizeof(config.llmProvider));
   if (configServer->hasArg("llmKey")) strlcpy(config.llmApiKey, configServer->arg("llmKey").c_str(), sizeof(config.llmApiKey));
   if (configServer->hasArg("llmUrl")) strlcpy(config.llmUrl, configServer->arg("llmUrl").c_str(), sizeof(config.llmUrl));
-  if (configServer->hasArg("haurl")) strlcpy(config.haUrl, configServer->arg("haurl").c_str(), sizeof(config.haUrl));
+  if (configServer->hasArg("haProto") && configServer->hasArg("haHost") && configServer->hasArg("haPort")) {
+    String assembled = configServer->arg("haProto") + configServer->arg("haHost") + ":" + configServer->arg("haPort");
+    strlcpy(config.haUrl, assembled.c_str(), sizeof(config.haUrl));
+  }
   if (configServer->hasArg("hatoken")) strlcpy(config.haToken, configServer->arg("hatoken").c_str(), sizeof(config.haToken));
   if (configServer->hasArg("tap")) config.tapThreshold = configServer->arg("tap").toFloat() / 10.0;
   if (configServer->hasArg("rec")) config.recordTime = configServer->arg("rec").toInt();
@@ -1221,12 +1264,16 @@ String transcribeAudio() {
 
 bool sendToHomeAssistant(const String &text) {
   HTTPClient http;
-  WiFiClientSecure client;
-  client.setInsecure();
-
+  WiFiClientSecure secClient;
+  WiFiClient plainClient;
   String url = String(config.haUrl) + "/api/conversation/process";
 
-  http.begin(client, url);
+  if (url.startsWith("https://")) {
+    secClient.setInsecure();
+    http.begin(secClient, url);
+  } else {
+    http.begin(plainClient, url);
+  }
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Authorization", "Bearer " + String(config.haToken));
   http.setTimeout(10000);
